@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#14243e">
+  <meta name="description" content="A free Windows app to find files on unplugged drives and browse locally stored media thumbnails.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Offline Drive Gallery">
+  <meta property="og:description" content="Find the drive. Recognize the file. Even when it is unplugged.">
+  <meta property="og:image" content="https://yotam1001.github.io/offline-drive-gallery/social-card.png">
+  <title>Offline Drive Gallery — find files on unplugged drives</title>
+  <style>
+    :root { color-scheme: light; --ink:#14243e; --muted:#56677e; --blue:#235bc6; --blue-dark:#153e91; --paper:#f7f9fd; --line:#dce5ef; }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { margin:0; background:var(--paper); color:var(--ink); font:16px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif; }
+    a { color:inherit; }
+    a:focus-visible, button:focus-visible, input:focus-visible { outline:3px solid #f8b34f; outline-offset:3px; }
+    .shell { width:min(1160px,calc(100% - 40px)); margin:auto; }
+    header { background:#14243e; color:#fff; }
+    nav { min-height:68px; display:flex; align-items:center; justify-content:space-between; gap:20px; }
+    .brand { display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:-.035em; text-decoration:none; font-size:19px; }
+    .brand-mark { width:31px; height:31px; display:grid; place-items:center; border-radius:9px; background:#5d91f2; color:#fff; font-size:20px; line-height:1; }
+    .nav-links { display:flex; align-items:center; gap:24px; font-size:14px; font-weight:650; }
+    .nav-links a { text-decoration:none; color:#dce7fa; }
+    .nav-links a:hover { color:#fff; text-decoration:underline; }
+    .hero { background:radial-gradient(circle at 76% 23%,#29538c 0,#1a3359 35%,#14243e 72%); color:#fff; padding:82px 0 92px; overflow:hidden; }
+    .hero-grid { display:grid; grid-template-columns:minmax(320px,.9fr) minmax(460px,1.1fr); align-items:center; gap:46px; }
+    .eyebrow { display:inline-block; margin:0 0 18px; padding:5px 10px; border:1px solid #6386b9; border-radius:999px; color:#bcd8ff; font-size:12px; font-weight:750; letter-spacing:.12em; text-transform:uppercase; }
+    h1 { max-width:580px; margin:0 0 20px; font-size:clamp(42px,5vw,68px); line-height:1.06; letter-spacing:-.065em; }
+    .hero p { max-width:530px; margin:0 0 28px; color:#cbd8eb; font-size:18px; }
+    .actions { display:flex; flex-wrap:wrap; gap:12px; align-items:center; }
+    .button { display:inline-flex; align-items:center; justify-content:center; min-height:44px; padding:10px 18px; border-radius:10px; text-decoration:none; font-weight:750; font-size:15px; transition:transform .15s,background .15s; }
+    .button:hover { transform:translateY(-2px); }
+    .button-primary { background:#82b5ff; color:#10233e; }
+    .button-primary:hover { background:#a7ccff; }
+    .button-ghost { border:1px solid #7895bd; color:#fff; }
+    .button-ghost:hover { background:#ffffff18; }
+    .small-note { font-size:13px !important; margin:14px 0 0 !important; color:#9fb4d1 !important; }
+    .demo-wrap { position:relative; }
+    .demo-wrap:after { content:""; position:absolute; z-index:0; inset:16px -16px -16px 16px; border-radius:17px; background:#77a7ed35; transform:rotate(2deg); }
+    .demo { position:relative; z-index:1; overflow:hidden; border:1px solid #a9c4eb; border-radius:16px; background:#fff; box-shadow:0 28px 70px #06122780; color:var(--ink); }
+    .demo-top { background:#1b2d4c; padding:12px 15px; color:#fff; display:flex; align-items:center; justify-content:space-between; font-size:12px; font-weight:800; letter-spacing:.035em; }
+    .window-dots { display:flex; gap:5px; }
+    .window-dots i { display:block; width:7px; height:7px; border-radius:50%; background:#8ca2c1; }
+    .demo-toolbar { display:flex; align-items:center; gap:8px; padding:12px; background:#edf2f8; border-bottom:1px solid var(--line); }
+    .demo-toolbar input { width:100%; min-width:0; border:1px solid #cbd9e9; border-radius:7px; padding:8px 11px; font:13px system-ui; color:var(--ink); background:#fff; }
+    .demo-toolbar span { white-space:nowrap; color:#45617d; font-size:11px; font-weight:700; }
+    .demo-body { display:grid; grid-template-columns:134px 1fr; min-height:330px; }
+    .demo-side { border-right:1px solid var(--line); padding:15px 9px; background:#f9fbfe; }
+    .demo-side strong { display:block; font-size:10px; letter-spacing:.1em; color:#788aa1; margin:0 6px 11px; }
+    .drive { border-radius:7px; padding:8px 7px; margin:3px 0; font-size:11px; color:#34506e; }
+    .drive.active { background:#dceaff; color:#143e83; font-weight:750; }
+    .demo-gallery { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:11px; align-content:start; padding:15px; }
+    .tile { min-width:0; border:1px solid #e2e9f2; border-radius:9px; background:#fff; padding:5px; text-align:left; cursor:pointer; color:#243c59; font:11px system-ui; box-shadow:0 2px 5px #213d6408; }
+    .tile:hover, .tile.selected { border-color:#5e9bed; box-shadow:0 0 0 2px #a8caff55; }
+    .tile[hidden] { display:none; }
+    .art { height:72px; border-radius:5px; overflow:hidden; margin-bottom:6px; }
+    .art.sunset { background:linear-gradient(160deg,#ffba7d 5%,#f17477 42%,#563e7b 66%,#15325e 68%); }
+    .art.woods { background:radial-gradient(circle at 75% 22%,#d8e7ab 0 9%,transparent 10%),linear-gradient(145deg,#b9d6cf 0 35%,#427d75 36% 66%,#244f52 67%); }
+    .art.sea { background:linear-gradient(#8ed2e4 0 45%,#f5dbaa 45% 55%,#3b9fb4 56% 100%); }
+    .art.city { background:linear-gradient(155deg,#a5b9ce 0 43%,#425975 44% 65%,#203753 66%); }
+    .art.portrait { background:radial-gradient(circle at 48% 35%,#f2bc96 0 17%,transparent 18%),linear-gradient(125deg,#99b6d0 0 45%,#264668 45%); }
+    .art.hills { background:linear-gradient(160deg,#c8d8e8 0 43%,#87a599 43% 67%,#5b7f67 67%); }
+    .tile-label { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; padding:0 2px 2px; }
+    .demo-caption { position:absolute; right:15px; bottom:12px; z-index:2; background:#14243ee0; padding:4px 9px; border-radius:5px; color:#d8e5f8; font-size:10px; }
+    section { padding:76px 0; }
+    h2 { margin:0 0 12px; font-size:clamp(29px,3.3vw,42px); line-height:1.16; letter-spacing:-.05em; }
+    .lead { color:var(--muted); max-width:720px; margin:0 0 30px; font-size:17px; }
+    .benefits { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+    .benefit { background:#fff; border:1px solid var(--line); border-radius:14px; padding:25px; box-shadow:0 5px 20px #17345d08; }
+    .benefit .icon { width:42px; height:42px; display:grid; place-items:center; background:#e4eeff; color:#2b5dab; border-radius:11px; font-size:21px; margin-bottom:18px; }
+    h3 { margin:0 0 7px; font-size:18px; letter-spacing:-.025em; }
+    .benefit p, .step p { margin:0; color:var(--muted); font-size:14px; }
+    .how { background:#eaf0f8; }
+    .steps { display:grid; grid-template-columns:repeat(3,1fr); gap:22px; counter-reset:steps; }
+    .step { position:relative; padding:22px 0 0; border-top:2px solid #a8bddb; }
+    .step:before { counter-increment:steps; content:counter(steps); position:absolute; top:-20px; left:0; width:36px; height:36px; display:grid; place-items:center; border-radius:50%; background:var(--blue); color:#fff; font-weight:800; }
+    .honest { display:grid; grid-template-columns:1fr 1fr; gap:34px; align-items:start; }
+    .honest p { color:var(--muted); margin:0 0 13px; }
+    .honest a { color:#164fa9; text-underline-offset:3px; }
+    .callout { background:#fff; border:1px solid var(--line); border-left:4px solid var(--blue); border-radius:10px; padding:22px; }
+    .callout p:last-child { margin-bottom:0; }
+    .final { text-align:center; background:#14243e; color:#fff; padding:62px 0; }
+    .final h2 { margin-bottom:18px; }
+    .final p { color:#c8d7eb; }
+    .final .actions { justify-content:center; }
+    footer { background:#0c192c; color:#9fb2cc; font-size:13px; padding:24px 0; }
+    footer .shell { display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; }
+    footer a { color:#dbe7f7; }
+    @media (max-width:900px) { .hero-grid { grid-template-columns:1fr; } .hero { padding:62px 0 80px; } .demo-wrap { max-width:650px; } }
+    @media (max-width:650px) { .shell { width:min(100% - 28px,1160px); } nav { min-height:62px; } .brand { font-size:16px; } .nav-links { gap:12px; } .nav-links a:nth-child(1) { display:none; } .hero { padding:55px 0 68px; } h1 { font-size:45px; } .hero p { font-size:16px; } .demo-body { grid-template-columns:90px 1fr; min-height:285px; } .demo-side { padding:10px 5px; } .drive { font-size:9px; } .demo-gallery { grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px; padding:9px; } .tile:nth-child(n+5) { display:none; } .benefits,.steps,.honest { grid-template-columns:1fr; } section { padding:58px 0; } .steps { gap:36px; } }
+  </style>
+</head>
+<body>
+  <header>
+    <nav class="shell" aria-label="Main navigation">
+      <a class="brand" href="#top"><span class="brand-mark" aria-hidden="true">▣</span> Offline Drive Gallery</a>
+      <div class="nav-links"><a href="#how">How it works</a><a href="#privacy">Privacy</a><a href="https://github.com/yotam1001/offline-drive-gallery">Source ↗</a></div>
+    </nav>
+  </header>
+  <main id="top">
+    <div class="hero">
+      <div class="shell hero-grid">
+        <div>
+          <span class="eyebrow">Free Windows app · Open source</span>
+          <h1>Find the drive.<br>Recognize the file.</h1>
+          <p>Search your unplugged drives and browse saved photo and video thumbnails. Find what you need before reaching for a cable.</p>
+          <div class="actions">
+            <a class="button button-primary" href="https://github.com/yotam1001/offline-drive-gallery/releases/latest/download/OfflineDriveGallery-win-x64.zip">Download for Windows ↓</a>
+            <a class="button button-ghost" href="https://github.com/yotam1001/offline-drive-gallery">View source ↗</a>
+          </div>
+          <p class="small-note">Windows 10/11 · Local catalog · No account or server</p>
+        </div>
+        <div class="demo-wrap">
+          <div class="demo" aria-label="Interactive illustration of the app gallery">
+            <div class="demo-top"><span>OFFLINE DRIVE GALLERY</span><span class="window-dots" aria-hidden="true"><i></i><i></i><i></i></span></div>
+            <div class="demo-toolbar"><input id="demo-search" type="search" placeholder="Try searching the sample files" aria-label="Search sample gallery"><span>Media only ✓</span></div>
+            <div class="demo-body">
+              <div class="demo-side"><strong>DRIVES</strong><div class="drive active">All drives</div><div class="drive">Family Photos</div><div class="drive">Archive 02</div><div class="drive">Travel SSD</div></div>
+              <div class="demo-gallery" id="demo-gallery">
+                <button class="tile" data-name="beach sunset.mp4"><div class="art sunset"></div><div class="tile-label">beach sunset.mp4</div></button>
+                <button class="tile" data-name="forest trail.jpg"><div class="art woods"></div><div class="tile-label">forest trail.jpg</div></button>
+                <button class="tile" data-name="coastline.mov"><div class="art sea"></div><div class="tile-label">coastline.mov</div></button>
+                <button class="tile" data-name="city night.mp4"><div class="art city"></div><div class="tile-label">city night.mp4</div></button>
+                <button class="tile" data-name="portrait 004.jpg"><div class="art portrait"></div><div class="tile-label">portrait 004.jpg</div></button>
+                <button class="tile" data-name="mountain trip.png"><div class="art hills"></div><div class="tile-label">mountain trip.png</div></button>
+              </div>
+            </div>
+          </div>
+          <span class="demo-caption">Illustrative demo</span>
+        </div>
+      </div>
+    </div>
+    <section>
+      <div class="shell">
+        <h2>Know what is on every drive</h2>
+        <p class="lead">Keep a searchable snapshot of your files and a visual memory of your media, all on your own PC.</p>
+        <div class="benefits">
+          <div class="benefit"><div class="icon" aria-hidden="true">⌕</div><h3>Search while unplugged</h3><p>Find a name or folder path and see which drive holds it, even when that drive is on a shelf.</p></div>
+          <div class="benefit"><div class="icon" aria-hidden="true">▧</div><h3>Browse saved thumbnails</h3><p>Recognize a poorly named photo or video from a thumbnail Windows extracted during the scan.</p></div>
+          <div class="benefit"><div class="icon" aria-hidden="true">◈</div><h3>Stay local and read-only</h3><p>Your files stay where they are. The app saves a catalog under your Windows profile without an account or server.</p></div>
+        </div>
+      </div>
+    </section>
+    <section class="how" id="how">
+      <div class="shell">
+        <h2>Three steps, no setup service</h2>
+        <p class="lead">The catalog is a snapshot you can refresh whenever the drive changes.</p>
+        <div class="steps"><div class="step"><h3>Add a drive</h3><p>Choose any drive or folder. The app reads file names and asks Windows for available media thumbnails.</p></div><div class="step"><h3>Unplug it</h3><p>Keep searching and paging through the saved gallery. Select a result to see its last known path.</p></div><div class="step"><h3>Rescan later</h3><p>Reconnect the drive and refresh the catalog. A canceled scan keeps the previous snapshot.</p></div></div>
+      </div>
+    </section>
+    <section id="privacy">
+      <div class="shell honest">
+        <div><h2>Built for a specific gap</h2><p>Free <a href="https://www.fsoft.it/VVV/">Virtual Volumes View</a> already catalogs disconnected disks well. <a href="https://www.wincatalog.com/disk-catalog.html">WinCatalog</a> offers thumbnails in a paid product. Offline Drive Gallery offers a small, open-source Windows gallery for this particular workflow.</p><p>It does not inspect media contents, OCR images, or keep a live backup. A rescan is needed after files change.</p></div>
+        <div class="callout"><h3>Your catalog stays on your PC</h3><p>File names, former paths, and thumbnails are stored in a local SQLite database. The app makes no network requests. The database is not encrypted, so keep it private if your files are sensitive.</p><p>Thumbnail availability depends on the image and video handlers installed in Windows. Unsupported formats show a labeled placeholder.</p></div>
+      </div>
+    </section>
+    <section class="final"><div class="shell"><h2>Search the shelf from your desk.</h2><p>Free, open source, and ready for Windows.</p><div class="actions"><a class="button button-primary" href="https://github.com/yotam1001/offline-drive-gallery/releases/latest/download/OfflineDriveGallery-win-x64.zip">Download for Windows ↓</a><a class="button button-ghost" href="https://github.com/yotam1001/offline-drive-gallery#build-and-verify">Build from source ↗</a></div></div></section>
+  </main>
+  <footer><div class="shell"><span>Offline Drive Gallery · MIT licensed</span><span><a href="https://github.com/yotam1001/offline-drive-gallery">GitHub</a> · <a href="https://github.com/yotam1001/offline-drive-gallery/issues">Issues</a></span></div></footer>
+  <script>
+    const demoSearch = document.getElementById('demo-search');
+    const tiles = [...document.querySelectorAll('#demo-gallery .tile')];
+    demoSearch.addEventListener('input', () => {
+      const query = demoSearch.value.trim().toLowerCase();
+      tiles.forEach(tile => { tile.hidden = !tile.dataset.name.includes(query); });
+    });
+    tiles.forEach(tile => tile.addEventListener('click', () => {
+      tiles.forEach(other => other.classList.remove('selected'));
+      tile.classList.add('selected');
+    }));
+  </script>
+</body>
+</html>

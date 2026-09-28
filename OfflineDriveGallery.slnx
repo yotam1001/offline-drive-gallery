@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/OfflineDriveGallery.Core/OfflineDriveGallery.Core.csproj" />
+    <Project Path="src/OfflineDriveGallery/OfflineDriveGallery.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/OfflineDriveGallery.Tests/OfflineDriveGallery.Tests.csproj" />
+  </Folder>
+</Solution>
